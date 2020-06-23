@@ -31,7 +31,7 @@ public class MainView extends VerticalLayout {
                 .setWidth("20px");
         grid.addColumn("message")
                 .setResizable(true)
-                .setWidth("500px");
+                .setWidth("600px");
         grid.addColumn("ip")
                 .setWidth("50px");
         grid.setColumnReorderingAllowed(true);

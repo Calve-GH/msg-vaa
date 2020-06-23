@@ -7,11 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.*;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +18,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringJoiner;
 
 @RestController
 @RequestMapping(value = BaseController.REST_URL)
@@ -114,7 +113,8 @@ public class BaseController {
     public void handleMsg() {
         String clientIp = getClientIp(request);
         String query = request.getQueryString();
-        if (switchUrls.contains(clientIp) || userUrls.contains(clientIp)) {
+        if (query.contains("event_type")) {
+//        if (switchUrls.contains(clientIp) || userUrls.contains(clientIp)) {
             messageRepository.save(new Message(query, clientIp));
         }
     }
