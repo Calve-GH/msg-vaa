@@ -23,6 +23,7 @@ public class MainView extends VerticalLayout {
     @Autowired
     public MainView(MessageService messageService) {
         this.messageService = messageService;
+        Label title = new Label("Message list");
         grid.addColumn("id")
                 .setResizable(false)
                 .setWidth("10px");
@@ -35,6 +36,7 @@ public class MainView extends VerticalLayout {
                 .setWidth("50px");
         grid.setColumnReorderingAllowed(true);
         grid.setHeightByRows(true);
+        add(title);
         add(grid);
         grid.setItems(messageService.findAll());
     }
