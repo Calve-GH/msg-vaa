@@ -107,39 +107,15 @@ public class BaseController {
         for (String value : values) {
             sj.add(value);
         }
-        sj.add("|");
         return sj.toString();
     }
 
     @PostMapping(path = "message-handle")
     public void handleMsg() {
         String clientIp = getClientIp(request);
-        if (switchUrls.contains(clientIp)) {
-            Map<String, String[]> parameterMap = request.getParameterMap();
-            StringJoiner sj = new StringJoiner("}, {", "{", "}");
-            for (String key : parameterMap.keySet()) {
-                sj.add(getStringParameter(key, parameterMap.get(key)));
-            }
-
-            messageRepository.save(new Message(clientIp + " " + sj.toString()));
-        }
-/*        try {
-            String queryString = request.getQueryString();
-            String url = endpointUrl + "?" + queryString;
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
-            ResponseEntity<String> result = restTemplate.postForEntity(url, request, String.class);
-            log.info(result.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        if (userUrls.contains(clientIp)) {
-            messageRepository.save(new Message("Test message from static ip"));
+        String query = request.getQueryString();
+        if (switchUrls.contains(clientIp) || userUrls.contains(clientIp)) {
+            messageRepository.save(new Message(query, clientIp));
         }
     }
 
@@ -147,7 +123,7 @@ public class BaseController {
     public ResponseEntity<String> getMsg() {
         String clientIp = getClientIp(request);
         if (userUrls.contains(clientIp)) {
-            return getResponseEntity(messageRepository.findAll());
+
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

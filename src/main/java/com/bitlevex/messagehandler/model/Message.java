@@ -1,27 +1,25 @@
 package com.bitlevex.messagehandler.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@ToString
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime date = LocalDateTime.now();
     private String msg;
+    private String ip;
 
-    public Message(String msg) {
+    public Message(String msg, String ip) {
         this.msg = msg;
+        this.ip = ip;
     }
 }
