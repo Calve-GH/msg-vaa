@@ -113,6 +113,7 @@ public class BaseController {
     public ResponseEntity<String> handleMsg() {
         String clientIp = getClientIp(request);
         String query = request.getQueryString();
+        System.out.println();//todo sout;
 //        if (query.contains("event_type")) {
 //        if (switchUrls.contains(clientIp) || userUrls.contains(clientIp)) {
             messageRepository.save(new Message(query, clientIp));
