@@ -110,20 +110,21 @@ public class BaseController {
     }
 
     @PostMapping(path = "message-handle")
-    public void handleMsg() {
+    public ResponseEntity<String> handleMsg() {
         String clientIp = getClientIp(request);
         String query = request.getQueryString();
-        if (query.contains("event_type")) {
+//        if (query.contains("event_type")) {
 //        if (switchUrls.contains(clientIp) || userUrls.contains(clientIp)) {
             messageRepository.save(new Message(query, clientIp));
-        }
+//        }
+        return new ResponseEntity<>("YES", HttpStatus.OK);
     }
 
     @GetMapping(path = "messages")
     public ResponseEntity<String> getMsg() {
         String clientIp = getClientIp(request);
         if (userUrls.contains(clientIp)) {
-
+            new ResponseEntity<>("MSGS", HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
