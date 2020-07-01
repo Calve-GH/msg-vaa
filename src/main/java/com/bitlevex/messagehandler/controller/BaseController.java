@@ -147,12 +147,14 @@ public class BaseController {
     @PostMapping(value = "/msg")
     public ResponseEntity<?> getParams(RequestEntity<String> request1) throws IOException {
 
-        String body = request1.getBody();
+        log.info(request1.getBody());
+        log.info(request1.toString());
+        log.info(request1.getUrl().toString());
 
         Map<String, String> stringStringMultiValueMap = parseFormData(request1);
-        System.out.println("---------------");//todo sout;
+        log.info("---------------");//todo sout;
         for (String s : stringStringMultiValueMap.keySet()) {
-            System.out.println(s + " : " + stringStringMultiValueMap.get(s));//todo sout;
+            log.info(s + " : " + stringStringMultiValueMap.get(s));//todo sout;
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
