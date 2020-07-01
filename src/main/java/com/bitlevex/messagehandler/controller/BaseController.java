@@ -144,7 +144,7 @@ public class BaseController {
 //        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(value = "/msg", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/msg")
     public ResponseEntity<?> getParams(RequestEntity<String> request1) throws IOException {
 
         String body = request1.getBody();
