@@ -3,24 +3,36 @@ package com.bitlevex.messagehandler.controller;
 import com.bitlevex.messagehandler.model.Message;
 import com.bitlevex.messagehandler.repository.MessageRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = BaseController.REST_URL)
@@ -113,20 +125,72 @@ public class BaseController {
     public ResponseEntity<String> handleMsg() {
         String clientIp = getClientIp(request);
         String query = request.getQueryString();
-        System.out.println();//todo sout;
+        if (query != null && !query.isEmpty()) {
 //        if (query.contains("event_type")) {
 //        if (switchUrls.contains(clientIp) || userUrls.contains(clientIp)) {
             messageRepository.save(new Message(query, clientIp));
-//        }
+        } else {
+            System.out.println();//todo sout;
+        }
         return new ResponseEntity<>("YES", HttpStatus.OK);
     }
 
     @GetMapping(path = "messages")
     public ResponseEntity<String> getMsg() {
         String clientIp = getClientIp(request);
-        if (userUrls.contains(clientIp)) {
-            new ResponseEntity<>("MSGS", HttpStatus.OK);
+//        if (userUrls.contains(clientIp)) {
+        return new ResponseEntity<>("MSGS", HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping(value = "/msg", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity<?> getParams(RequestEntity<String> request1) throws IOException {
+
+        String body = request1.getBody();
+
+        Map<String, String> stringStringMultiValueMap = parseFormData(request1);
+        System.out.println("---------------");//todo sout;
+        for (String s : stringStringMultiValueMap.keySet()) {
+            System.out.println(s + " : " + stringStringMultiValueMap.get(s));//todo sout;
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private static InputStream getInputStream(String src) {
+        try {
+            return IOUtils.toInputStream(src, "utf-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static String getValue(String[] pair) {
+        if (pair.length == 2) return pair[1];
+        return null;
+    }
+
+    private final Pattern paramPattern = Pattern.compile("^((?:[0-9A-Za-z._~-]|%\\p{XDigit}{2})+)(?:=((?:[0-9A-Za-z._~+-]|%\\p{XDigit}{2})*))?$");
+
+    private Map<String, String> parseFormData(HttpEntity<String> message) throws UnsupportedEncodingException {
+        MediaType contentType = message.getHeaders().getContentType();
+        Charset charset = (contentType != null && contentType.getCharset() != null ?
+                contentType.getCharset() : StandardCharsets.UTF_8);
+        String body = message.getBody();
+
+        String[] pairs = org.springframework.util.StringUtils.tokenizeToStringArray(body, "&");
+        HashMap<String, String> valueMap = new LinkedHashMap<>(pairs.length);
+        for (String pair : pairs) {
+            Matcher matcher = paramPattern.matcher(pair);
+            if (!matcher.matches())
+                throw new IllegalArgumentException("bad message format");
+
+            String name = URLDecoder.decode(matcher.group(1), charset.name());
+            System.out.println(matcher.group(2));//todo sout;
+            String value = matcher.group(2) != null ? URLDecoder.decode(matcher.group(2), charset.name()) : null;
+            valueMap.put(name, value);
+        }
+        return valueMap;
     }
 }
