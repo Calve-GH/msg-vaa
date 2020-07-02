@@ -1,5 +1,6 @@
 package com.bitlevex.messagehandler.controller;
 
+import com.bitlevex.messagehandler.dto.MessageDto;
 import com.bitlevex.messagehandler.model.Message;
 import com.bitlevex.messagehandler.repository.MessageRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +14,7 @@ import org.springframework.http.*;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,6 +27,7 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,6 +63,21 @@ public class BaseController {
                 .setReadTimeout(Duration.ofSeconds(2))
                 .build();
     }
+
+    @GetMapping("get-msg")
+    public List<MessageDto> getMessagesLimit5() {
+        return messageRepository.findAll().stream()
+                .limit(5)
+                .map(MessageDto::convertMessage)
+                .collect(Collectors.toList());
+    }
+
+    @PostMapping("new-msg")
+    public void saveMessage(@RequestBody MessageDto message) {
+        messageRepository.save(new Message(null, LocalDateTime.now(), message.getMessage(), "localhost"));
+    }
+
+
 
     private static ResponseEntity<String> getResponseEntity(List<Message> messages) {
         StringJoiner sj = new StringJoiner(System.lineSeparator());
