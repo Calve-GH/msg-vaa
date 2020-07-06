@@ -173,6 +173,13 @@ public class BaseController {
         return new ResponseEntity<>("YES", HttpStatus.OK);
     }
 
+    @GetMapping("/msg")
+    public ResponseEntity<String> gettParams(RequestEntity<String> request1) {
+        log.info("body: " + request1.getBody());
+        log.info("all: " + request1.toString());
+        return new ResponseEntity<>("YES", HttpStatus.OK);
+    }
+
     private static InputStream getInputStream(String src) {
         try {
             return IOUtils.toInputStream(src, "utf-8");
