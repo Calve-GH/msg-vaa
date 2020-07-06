@@ -159,7 +159,7 @@ public class BaseController {
     }
 
     @PostMapping(value = "/msg")
-    public ResponseEntity<?> getParams(RequestEntity<String> request1) throws IOException {
+    public ResponseEntity<String> getParams(RequestEntity<String> request1) throws IOException {
 
         log.info(request1.getBody());
         log.info(request1.toString());
@@ -170,7 +170,7 @@ public class BaseController {
         for (String s : stringStringMultiValueMap.keySet()) {
             log.info(s + " : " + stringStringMultiValueMap.get(s));//todo sout;
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("YES", HttpStatus.OK);
     }
 
     private static InputStream getInputStream(String src) {
