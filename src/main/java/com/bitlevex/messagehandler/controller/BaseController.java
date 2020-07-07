@@ -170,7 +170,10 @@ public class BaseController {
         for (String s : stringStringMultiValueMap.keySet()) {
             log.info(s + " : " + stringStringMultiValueMap.get(s));//todo sout;
         }
-        return new ResponseEntity<>("YES", HttpStatus.OK);
+        if (request1.getBody().contains("PREREQUEST")) {
+            return new ResponseEntity<>("YES", HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/msg")
